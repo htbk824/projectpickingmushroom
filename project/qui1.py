@@ -24,6 +24,7 @@ def quizz1():
     bbutton = pygame.Rect(325, 425, 35, 35)
     cbutton = pygame.Rect(590, 315, 35, 35)
     dbutton = pygame.Rect(590, 425, 35, 35)
+    practiceinmenu = pygame.Rect(339,375,294,43)
     try_againbutton = pygame.Rect(447,433,160,40)
     go_ahead_button = pygame.Rect(446,432,160,41)
     image_paths = ["quizz1.png", "quizz1_2.png", "quizz1.png", "quizz1_2.png", "quizz1.png", "quizz1_2.png"]
@@ -43,7 +44,7 @@ def quizz1():
     images = [load_image(path) for path in image_paths]
     current_image_index = 0
     score = 0 
-    image_times = [3, 30, 30, 30, 30, 30]
+    image_times = [30, 30, 30, 30, 30, 30]
     game_over = False
     running = True
     is_timeup = False
@@ -51,7 +52,7 @@ def quizz1():
     at_last_index = False 
     go_ahead = False
     fail = False
-
+    show_menu = False
     def check_answer(selected_answer):
         nonlocal score, current_image_index, total_seconds
         if current_image_index <= len(images)-1:
@@ -61,12 +62,12 @@ def quizz1():
             current_image_index += 1
             if current_image_index < len(image_times):
                 total_seconds = image_times[current_image_index]
-
     while running:
         for event in pygame.event.get():
             print(pygame.mouse.get_pos())
             if event.type == pygame.QUIT:
                 running = False
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if abutton.collidepoint(event.pos):
                     check_answer('A')
@@ -79,16 +80,19 @@ def quizz1():
                 if is_timeup or fail and try_againbutton.collidepoint(event.pos):
                     quizz1()
                     break
-                if go_ahead and go_ahead_button.collidepoint(event.pos):
-                    pygame.display.update()
-                    screen.blit(menu_playon_image, (0, 0))
-                    
-
+                if go_ahead and go_ahead_button.collidepoint(event.pos):                    
+                    show_menu = True
+                if show_menu and practiceinmenu.collidepoint(event.pos):
+                    test.main()
+        if show_menu:
+            screen.blit(menu_playon_image, (0, 0))
+            pygame.display.update()  
+            show_menu = True
 
         if not game_over:
             total_seconds -= clock.tick_busy_loop(60) / 1000.0
 
-        if current_image_index == len(images):
+        if current_image_index == len(images) and show_menu == False:
             at_last_index = True
             if score < 5:
                 screen.blit(fail_image, (0, 0))
